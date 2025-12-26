@@ -1,59 +1,57 @@
 <script lang="ts">
-import welcomeFallback from "$lib/images/svelte-welcome.png";
-import welcome from "$lib/images/svelte-welcome.webp";
-import Counter from "./Counter.svelte";
+	import { Button } from '$lib/components/ui/button';
+	import { ArrowRight, BarChart3 } from 'lucide-svelte';
 </script>
 
 <svelte:head>
-    <title>Home</title>
-    <meta name="description" content="Svelte demo app" />
+	<title>VoteHub - Community Polls</title>
+	<meta name="description" content="Create and vote on community polls" />
 </svelte:head>
 
 <section>
-    <h1>
-        <span class="welcome">
-            <picture>
-                <source srcset={welcome} type="image/webp" />
-                <img src={welcomeFallback} alt="Welcome" />
-            </picture>
-        </span>
+	<h1>
+		<span class="welcome">
+			<BarChart3 size={200} />
+		</span>
 
-        to your new<br />SvelteKit app
-    </h1>
+		VoteHub
+	</h1>
 
-    <h2>
-        try editing <strong>src/routes/+page.svelte</strong>
-    </h2>
+	<h2>Create polls, share opinions, and see real-time results</h2>
 
-    <Counter />
+	<div class="actions">
+		<Button href="/polls" size="lg" class="gap-2">
+			View Polls
+			<ArrowRight size={18} />
+		</Button>
+		<Button href="/polls/create" variant="outline" size="lg">Create Poll</Button>
+	</div>
 </section>
 
 <style>
 section {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  flex: 0.6;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	flex: 0.6;
 }
 
 h1 {
-  width: 100%;
+	width: 100%;
 }
 
 .welcome {
-  display: block;
-  position: relative;
-  width: 100%;
-  height: 0;
-  padding: 0 0 calc(100% * 495 / 2048) 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	color: var(--color-theme-1);
+	margin-bottom: 2rem;
 }
 
-.welcome img {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  display: block;
+.actions {
+	display: flex;
+	gap: 1rem;
+	margin-top: 2rem;
 }
 </style>
