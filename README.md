@@ -1,46 +1,93 @@
-# sv
+# PollTier - Polls with Tierlist Results
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+A simple poll application that displays results in tierlist format (S, A, B, C tiers).
 
-## Technology Stack
+## Features
 
-- **Runtime**: Node.js v24.6.0 (LTS) | [Docs](https://nodejs.org/docs/latest-v24.x/)
-- **Package Manager**: [pnpm](https://pnpm.io) | [Docs](https://pnpm.io/cli)
-- **Framework**: [Svelte](https://svelte.dev) | [Creating a Project](https://svelte.dev/docs/kit/creating-a-project) | [Docs](https://svelte.dev/docs)
-- **Linting**: [oxlint](https://oxc.rs) | [Linter Guide](https://oxc.rs/docs/guide/usage/linter.html)
-- **Code Formatting**: [dprint](https://dprint.dev) | [CLI Documentation](https://dprint.dev/cli/)
+- **Easy Poll Creation**: Create polls with a title, optional description, and custom options
+- **Simple Voting**: One vote per user (tracked by IP + User-Agent hash)
+- **Tierlist Dashboard**: Results displayed as a ranked tierlist
+  - S Tier (Red): Top 20% by votes
+  - A Tier (Orange): Next 30% by votes
+  - B Tier (Yellow): Next 30% by votes
+  - C Tier (Gray): Remaining options
+- **No Authentication Required**: Instant voting without signup
 
-## Creating a project
+## Tech Stack
 
-If you're seeing this, you've probably already done this step. Congrats!
+- **Frontend**: SvelteKit 2 + Svelte 5
+- **UI**: shadcn-svelte + Tailwind CSS v4
+- **Database**: SQLite + Drizzle ORM
+- **Icons**: Lucide Svelte
 
-```sh
-# create a new project in the current directory
-pnpm create sv
+## Getting Started
 
-# create a new project in my-app
-pnpm create sv my-app
+### Install Dependencies
+
+```bash
+pnpm install
 ```
 
-## Developing
+### Setup Database
 
-Once you've created a project and installed dependencies with `pnpm install`, start a development server:
+The database will be automatically created on first run. To manually run migrations:
 
-```sh
-pnpm run dev
-
-# or start the server and open the app in a new browser tab
-pnpm run dev -- --open
+```bash
+pnpm tsx src/lib/db/migrate.ts
 ```
 
-## Building
+### Development
 
-To create a production version of your app:
-
-```sh
-pnpm run build
+```bash
+pnpm dev
 ```
 
-You can preview the production build with `pnpm run preview`.
+Visit [http://localhost:5173](http://localhost:5173)
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+### Build
+
+```bash
+pnpm build
+```
+
+### Preview Production Build
+
+```bash
+pnpm preview
+```
+
+## Project Structure
+
+```
+src/
+├── lib/
+│   ├── components/ui/     # shadcn-svelte components
+│   ├── db/                # Database schema and connection
+│   ├── tier.ts            # Tier calculation logic
+│   └── hash.ts            # Voter hash generation
+├── routes/
+│   ├── +page.svelte       # Home page
+│   ├── create/            # Poll creation page
+│   └── poll/[id]/         # Vote page and dashboard
+```
+
+## How It Works
+
+1. **Create a Poll**: Add a title, description, and at least 2 options
+2. **Share the Link**: Send the poll URL to voters
+3. **Vote**: Each person votes once (tracked by browser/IP)
+4. **View Dashboard**: See results ranked in tierlist format
+
+## Database Schema
+
+- **polls**: Poll metadata (title, description, tier labels)
+- **options**: Poll options with sort order
+- **votes**: Vote records with voter hash for duplicate prevention
+
+## Future Enhancements
+
+- Real-time updates
+- Custom tier labels
+- Poll expiration dates
+- Vote analytics
+- Export results

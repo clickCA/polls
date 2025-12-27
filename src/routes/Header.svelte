@@ -1,130 +1,41 @@
 <script lang="ts">
-import { resolve } from "$app/paths";
-import { page } from "$app/state";
-import github from "$lib/images/github.svg";
-import logo from "$lib/images/svelte-logo.svg";
+	import { page } from '$app/state';
+	import { Button } from '$lib/components/ui/button';
+	import { Plus, BarChart3 } from 'lucide-svelte';
 </script>
 
-<header>
-    <div class="corner">
-        <a href="https://svelte.dev/docs/kit">
-            <img src={logo} alt="SvelteKit" />
-        </a>
-    </div>
+<header class="border-b">
+	<div class="container mx-auto max-w-7xl px-4">
+		<div class="flex h-16 items-center justify-between">
+			<div class="flex items-center gap-8">
+				<a href="/" class="text-2xl font-bold">
+					Poll<span class="text-primary">Tier</span>
+				</a>
 
-    <nav>
-        <svg viewBox="0 0 2 3" aria-hidden="true">
-            <path d="M0,0 L1,2 C1.5,3 1.5,3 2,3 L2,0 Z" />
-        </svg>
-        <ul>
-            <li aria-current={page.url.pathname === "/" ? "page" : undefined}>
-                <a href={resolve("/")}>Home</a>
-            </li>
-            <li aria-current={page.url.pathname === "/about" ? "page" : undefined}>
-                <a href={resolve("/about")}>About</a>
-            </li>
-            <li aria-current={page.url.pathname.startsWith("/sverdle") ? "page" : undefined}>
-                <a href={resolve("/sverdle")}>Sverdle</a>
-            </li>
-        </ul>
-        <svg viewBox="0 0 2 3" aria-hidden="true">
-            <path d="M0,0 L0,3 C0.5,3 0.5,3 1,2 L2,0 Z" />
-        </svg>
-    </nav>
+				<nav class="hidden md:flex items-center gap-6">
+					<a
+						href="/"
+						class="text-sm font-medium transition-colors hover:text-primary"
+						class:text-primary={page.url.pathname === '/'}
+					>
+						Home
+					</a>
+					<a
+						href="/polls"
+						class="text-sm font-medium transition-colors hover:text-primary"
+						class:text-primary={page.url.pathname === '/polls'}
+					>
+						Browse Polls
+					</a>
+				</nav>
+			</div>
 
-    <div class="corner">
-        <a href="https://github.com/sveltejs/kit">
-            <img src={github} alt="GitHub" />
-        </a>
-    </div>
+			<div class="flex items-center gap-2">
+				<Button href="/create" size="sm">
+					<Plus class="h-4 w-4 mr-2" />
+					Create
+				</Button>
+			</div>
+		</div>
+	</div>
 </header>
-
-<style>
-header {
-  display: flex;
-  justify-content: space-between;
-}
-
-.corner {
-  width: 3em;
-  height: 3em;
-}
-
-.corner a {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-}
-
-.corner img {
-  width: 2em;
-  height: 2em;
-  object-fit: contain;
-}
-
-nav {
-  display: flex;
-  justify-content: center;
-  --background: rgba(255, 255, 255, 0.7);
-}
-
-svg {
-  width: 2em;
-  height: 3em;
-  display: block;
-}
-
-path {
-  fill: var(--background);
-}
-
-ul {
-  position: relative;
-  padding: 0;
-  margin: 0;
-  height: 3em;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  list-style: none;
-  background: var(--background);
-  background-size: contain;
-}
-
-li {
-  position: relative;
-  height: 100%;
-}
-
-li[aria-current="page"]::before {
-  --size: 6px;
-  content: "";
-  width: 0;
-  height: 0;
-  position: absolute;
-  top: 0;
-  left: calc(50% - var(--size));
-  border: var(--size) solid transparent;
-  border-top: var(--size) solid var(--color-theme-1);
-}
-
-nav a {
-  display: flex;
-  height: 100%;
-  align-items: center;
-  padding: 0 0.5rem;
-  color: var(--color-text);
-  font-weight: 700;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  text-decoration: none;
-  transition: color 0.2s linear;
-}
-
-a:hover {
-  color: var(--color-theme-1);
-}
-</style>
