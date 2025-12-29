@@ -11,8 +11,7 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
 # Install dependencies with cache mount
-RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
-    pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile
 
 # Copy source code
 COPY . .
@@ -44,7 +43,6 @@ EXPOSE 3000
 # Set environment variable
 ENV NODE_ENV=production
 ENV PORT=3000
-ENV ORIGIN=http://localhost:3000
 
 # Start the application
-CMD ["node", "build/index.js"]
+CMD ["node", "build"]
