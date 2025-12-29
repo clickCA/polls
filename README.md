@@ -105,6 +105,36 @@ Stop and remove volumes:
 docker compose down -v
 ```
 
+#### Using Cloudflare Tunnel (Optional)
+
+To expose your app publicly using Cloudflare Tunnel:
+
+1. Create a tunnel in your Cloudflare Zero Trust dashboard
+2. Get your tunnel token
+3. Create a `.env` file in the project root:
+
+```bash
+CLOUDFLARE_TUNNEL_TOKEN=your_tunnel_token_here
+```
+
+4. Start all services including the tunnel:
+
+```bash
+docker compose --env-file .env up -d
+```
+
+The Cloudflare tunnel will:
+- Create a secure outbound connection to Cloudflare
+- Expose your app on your configured domain (e.g., `https://polls.yourdomain.com`)
+- Handle SSL/TLS automatically
+- Protect your app with Cloudflare's security features
+
+To stop all services including the tunnel:
+
+```bash
+docker compose down
+```
+
 #### Manual Build
 
 Build for production:
