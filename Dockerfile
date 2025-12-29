@@ -1,19 +1,18 @@
+# syntax=docker/dockerfile:1
 # Build stage
 FROM node:24.12.0-alpine AS builder
 
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
-# Install build dependencies for better-sqlite3
-RUN apk add --no-cache python3 make g++
-
 WORKDIR /app
 
 # Copy package files
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
-# Install dependencies
-RUN pnpm install --frozen-lockfile
+# Install dependencies with cache mount
+RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
+    pnpm install --frozen-lockfile
 
 # Copy source code
 COPY . .
@@ -26,9 +25,6 @@ FROM node:24.12.0-alpine
 
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@latest --activate
-
-# Install runtime dependencies for better-sqlite3
-RUN apk add --no-cache python3 make g++
 
 WORKDIR /app
 
@@ -48,6 +44,7 @@ EXPOSE 3000
 # Set environment variable
 ENV NODE_ENV=production
 ENV PORT=3000
+ENV ORIGIN=http://localhost:3000
 
 # Start the application
-CMD ["node", "build"]
+CMD ["node", "build/index.js"]

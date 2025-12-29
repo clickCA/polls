@@ -19,39 +19,50 @@ A simple poll application that displays results in tierlist format (S, A, B, C t
 
 - **Frontend**: SvelteKit 2 + Svelte 5
 - **UI**: shadcn-svelte + Tailwind CSS v4
-- **Database**: SQLite + Drizzle ORM
+- **Database**: PostgreSQL 16 + Drizzle ORM
 - **Icons**: Lucide Svelte
+- **Deployment**: Docker Compose
 
 ## Getting Started
 
-### 1. Install Dependencies
+### Development Setup
+
+#### 1. Install Dependencies
 
 ```bash
 pnpm install
 ```
 
-**Important**: If you encounter issues with `better-sqlite3` native bindings:
+#### 2. Start PostgreSQL Database
+
+Using Docker Compose:
 
 ```bash
-cd node_modules/.pnpm/better-sqlite3@12.5.0/node_modules/better-sqlite3
-npm run build-release
-cd ../../../../../..
+docker compose up -d postgres
 ```
 
-### 2. Setup Database
+This starts PostgreSQL on `localhost:5432` with:
+- Database: `polls`
+- Username: `postgres`
+- Password: `postgres`
 
-Run the database migrations to create the SQLite database and tables:
+#### 3. Generate and Run Migrations
+
+Generate migration files from schema:
+
+```bash
+pnpm db:generate
+```
+
+Apply migrations to create tables:
 
 ```bash
 pnpm db:migrate
 ```
 
-This will:
-- Create `sqlite.db` file in the project root
-- Create tables: `polls`, `options`, `votes`, and migration tracking
-- Set up the complete schema for the application
+This creates tables: `polls`, `options`, `votes`, and migration tracking.
 
-### 3. Development
+#### 4. Development Server
 
 Start the development server:
 
@@ -66,17 +77,59 @@ The app will be available with:
 - Browse all polls at `/polls`
 - Create poll at `/create`
 
-### 4. Build for Production
+### Production Deployment
+
+#### Using Docker Compose (Recommended)
+
+Build and start all services:
+
+```bash
+docker compose up -d
+```
+
+This will:
+1. Start PostgreSQL database with persistent volume
+2. Build and start the application
+3. Run migrations automatically
+4. Expose the app on `localhost:3000`
+
+Stop services:
+
+```bash
+docker compose down
+```
+
+Stop and remove volumes:
+
+```bash
+docker compose down -v
+```
+
+#### Manual Build
+
+Build for production:
 
 ```bash
 pnpm build
 ```
 
-### 5. Preview Production Build
+Preview production build:
 
 ```bash
 pnpm preview
 ```
+
+## Environment Variables
+
+The application uses the following environment variable:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `DATABASE_URL` | `postgresql://postgres:postgres@localhost:5432/polls` | PostgreSQL connection string |
+| `NODE_ENV` | `development` | Environment mode (production/development) |
+| `PORT` | `3000` | Port for production server |
+
+For development, the defaults work with the Docker Compose setup. For production, set `DATABASE_URL` to your PostgreSQL instance.
 
 ## Database Management
 
@@ -107,19 +160,25 @@ This creates SQL migration files in the `drizzle/` directory.
 
 ### Inspecting the Database
 
-To view the database using SQLite CLI:
+Using Docker Compose:
 
 ```bash
-sqlite3 sqlite.db
+docker compose exec postgres psql -U postgres -d polls
 ```
 
-Common SQLite commands:
+Or connect from host (requires PostgreSQL client):
+
+```bash
+psql postgresql://postgres:postgres@localhost:5432/polls
+```
+
+Common PostgreSQL commands:
 ```sql
-.tables                    -- List all tables
-.schema polls              -- View table structure
+\dt                        -- List all tables
+\d polls                   -- View table structure
 SELECT * FROM polls;       -- Query all polls
 SELECT COUNT(*) FROM votes;-- Count total votes
-.quit                      -- Exit SQLite
+\q                         -- Exit psql
 ```
 
 ## Project Structure
@@ -171,7 +230,7 @@ src/
 - `description` (TEXT) - Optional poll description
 - `result_type` (TEXT) - Display type (default: "TIERLIST")
 - `tier_labels` (TEXT) - JSON array of tier labels (default: ["S","A","B","C"])
-- `created_at` (INTEGER) - Unix timestamp of creation
+- `created_at` (TIMESTAMP) - Timestamp of creation (default: now())
 
 **options**
 - `id` (TEXT, PRIMARY KEY) - Unique option identifier
@@ -184,44 +243,51 @@ src/
 - `poll_id` (TEXT, FOREIGN KEY) - References polls(id)
 - `option_id` (TEXT, FOREIGN KEY) - References options(id)
 - `voter_hash` (TEXT, NOT NULL) - SHA-256 hash for duplicate prevention
-- `created_at` (INTEGER) - Unix timestamp of vote
+- `created_at` (TIMESTAMP) - Timestamp of vote (default: now())
 
 ## Troubleshooting
 
-### better-sqlite3 Build Issues
+### Database Connection Issues
 
-If you encounter `Cannot find bindings file` errors:
-
-```bash
-cd node_modules/.pnpm/better-sqlite3@12.5.0/node_modules/better-sqlite3
-npm run build-release
-cd ../../../../../..
-pnpm db:migrate
-```
-
-### Database Not Found
-
-If the app can't find the database:
+If the app can't connect to PostgreSQL:
 
 ```bash
-# Make sure you're in the project root
-pwd  # Should show .../polls
+# Check if PostgreSQL is running
+docker compose ps
 
-# Run migrations
-pnpm db:migrate
+# View PostgreSQL logs
+docker compose logs postgres
 
-# Verify database exists
-ls -lh sqlite.db
+# Restart PostgreSQL
+docker compose restart postgres
 ```
 
 ### Migration Errors
 
 If migrations fail:
 
-1. Delete the database: `rm sqlite.db*`
+1. Reset the database:
+```bash
+docker compose down -v
+docker compose up -d postgres
+```
+
 2. Delete migration folder: `rm -rf drizzle/`
 3. Regenerate migrations: `pnpm db:generate`
 4. Run migrations: `pnpm db:migrate`
+
+### Port Already in Use
+
+If port 5432 or 3000 is already in use:
+
+```bash
+# Find process using the port
+lsof -i :5432
+lsof -i :3000
+
+# Change ports in compose.yml
+# For example: "5433:5432" for PostgreSQL
+```
 
 ## Future Enhancements
 
