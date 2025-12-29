@@ -47,4 +47,4 @@ ENV PORT=3000
 ENV ORIGIN=http://localhost:3000
 
 # Start the application
-CMD ["node", "build/index.js"]
+CMD node build/index.js

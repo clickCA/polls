@@ -17,10 +17,23 @@ services:
       timeout: 5s
       retries: 5
 
+  migrate:
+    build:
+      context: .
+      dockerfile: migrate.dockerfile
+    container_name: polls-migrate
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/polls
+    command: sh -c "pnpm db:generate && pnpm db:migrate"
+
   app:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: app.dockerfile
     container_name: polls-app
     restart: unless-stopped
     ports:
@@ -28,6 +41,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
     environment:
       - NODE_ENV=production
       - PORT=3000

@@ -90,7 +90,7 @@ docker compose up -d
 This will:
 1. Start PostgreSQL database with persistent volume
 2. Build and start the application
-3. Run migrations automatically
+3. Generate and run database migrations automatically on startup
 4. Expose the app on `localhost:3000`
 
 Stop services:
